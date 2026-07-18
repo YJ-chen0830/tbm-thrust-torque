@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>頂管/潛盾工程推進力計算 | Pipe Jacking / TBM Thrust Force</title>
+<script src="https://yj-chen0830.github.io/jrh-core/jrh-core.js?v=3" defer></script>
+<style>
+  :root{--navy:#0b1f3a;--navy2:#13284a;--gold:#c9a14a;--gold2:#e0bf6e;--bg:#f5f3ee;--ink:#1c2530;--line:#d8d2c2;}
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Noto Sans TC","Segoe UI",sans-serif;background:var(--bg);color:var(--ink);}
+  header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#f5f3ee;padding:28px 32px;}
+  header h1{margin:0;font-size:22px;}
+  header span{color:var(--gold2);font-size:13px;display:block;margin-top:4px;}
+  main{max-width:1060px;margin:0 auto;padding:28px 20px 60px;}
+  .grid{display:grid;grid-template-columns:340px 1fr;gap:24px;}
+  @media(max-width:820px){.grid{grid-template-columns:1fr;}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px 24px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .card h2{font-size:14.5px;margin:0 0 18px;color:var(--navy);font-weight:700;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--gold);padding-bottom:10px;}
+  label{display:block;font-size:12px;color:#666;margin:10px 0 4px;font-weight:500;}
+  input,select{width:100%;padding:8px 11px;border:1.5px solid var(--line);border-radius:7px;font-size:13.5px;background:#fafaf8;}
+  input:focus,select:focus{outline:none;border-color:var(--gold);}
+  .sec{font-size:12px;font-weight:700;color:var(--navy);margin:16px 0 6px;border-left:4px solid var(--gold);padding-left:9px;letter-spacing:.04em;text-transform:uppercase;}
+  .note{font-size:11.5px;color:#666;margin-top:12px;line-height:1.75;background:#f9f7f2;border-radius:6px;padding:9px 12px;}
+  button.calc-btn{margin-top:16px;width:100%;padding:12px;border:none;border-radius:8px;background:var(--navy);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;}
+  button.calc-btn:hover{background:var(--navy2);}
+  button.pro-btn{margin-top:12px;width:100%;padding:12px;border:none;border-radius:8px;background:var(--gold);color:var(--navy);font-size:14.5px;font-weight:700;cursor:pointer;}
+  button.pro-btn:hover{filter:brightness(1.08);}
+  table{width:100%;border-collapse:collapse;margin-top:10px;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  th{background:var(--navy);color:#f5f3ee;font-weight:600;font-size:12px;padding:9px 10px;text-align:left;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  td{padding:9px 10px;font-size:13px;border-bottom:1px solid var(--line);}
+  tr:nth-child(even) td{background:#f9f7f3;}
+  td:last-child{text-align:right;font-weight:700;}
+  .ok{color:#1a7d3a;font-weight:700;}
+  .ng{color:#c0392b;font-weight:700;}
+  .warn{color:#8a5b12;font-weight:700;}
+  details.proc{margin-top:16px;border:1px solid var(--line);border-radius:8px;background:#fafaf8;overflow:hidden;}
+  details.proc summary{cursor:pointer;padding:10px 14px;font-weight:700;font-size:13px;color:var(--navy);user-select:none;list-style:none;display:flex;align-items:center;gap:6px;}
+  details.proc summary::before{content:"▶";font-size:10px;transition:transform .2s;}
+  details[open].proc summary::before{transform:rotate(90deg);}
+  details.proc pre{margin:0;padding:12px 16px 16px;font-family:"Courier New",monospace;font-size:11.5px;line-height:1.9;white-space:pre-wrap;color:#2c3e50;border-top:1px solid var(--line);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .proj-section{background:#fff;border:1px solid var(--gold);border-radius:10px;padding:18px 22px;margin-bottom:20px;}
+  .proj-section h3{margin:0 0 12px;color:var(--navy);font-size:14px;font-weight:700;}
+  .proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media(max-width:600px){.proj-grid,.row2{grid-template-columns:1fr;}}
+  .mob-tabs{display:none;}
+  .inline-note{font-size:11px;color:#7a7a7a;margin-top:4px;}
+  .hidden{display:none;}
+  @media screen and (max-width:767px){
+    .mob-tabs{display:flex;background:var(--bg);border-bottom:2px solid var(--line);margin:0 -20px 0;padding:0 20px;}
+    .mob-tab{flex:1;padding:11px 4px;text-align:center;font-size:13.5px;font-weight:700;color:#888;cursor:pointer;background:transparent;border:none;border-bottom:3px solid transparent;}
+    .mob-tab.active{color:var(--navy);border-bottom-color:var(--gold);}
+    .grid{display:block;}
+    .grid>.card{display:none;}
+    .grid>.card.mob-active{display:block;}
+  }
+  @media print{
+    header,.no-print{display:none!important;}
+    body{background:#fff;margin:0;font-size:9pt;line-height:1.5;color:#111;}
+    main{padding:0;max-width:100%!important;}
+    .grid{grid-template-columns:1fr!important;gap:10pt!important;}
+    .card{box-shadow:none!important;border:1px solid #ccc!important;border-radius:4pt!important;padding:10pt 12pt!important;break-inside:avoid;}
+    .card h2{font-size:10.5pt!important;padding-bottom:6pt!important;margin-bottom:9pt!important;}
+    label{font-size:8pt!important;margin:6pt 0 2pt!important;}
+    .sec{font-size:8pt!important;margin:10pt 0 4pt!important;}
+    .note,.inline-note{font-size:7.5pt!important;padding:6pt 9pt!important;}
+    table{border:1px solid #bbb!important;border-radius:0!important;margin-top:6pt!important;}
+    th{font-size:8pt!important;padding:5pt 7pt!important;background:#0b1f3a!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    td{font-size:8.5pt!important;padding:5pt 7pt!important;}
+    tr:nth-child(even) td{background:#f5f5f5!important;}
+    details.proc{display:block!important;margin-top:10pt!important;border:1pt solid #0b1f3a!important;border-radius:4pt!important;break-inside:avoid;background:#f9f9f6!important;}
+    details.proc>summary{display:none!important;}
+    details.proc::before{content:"📋  計算過程（供第三方檢核）";display:block;font-weight:700;font-size:8pt;color:#0b1f3a;padding:6pt 10pt 4pt;border-bottom:1px solid #ccc;letter-spacing:.04em;}
+    details.proc>pre{font-size:7pt!important;line-height:1.65!important;white-space:pre-wrap!important;padding:6pt 10pt 10pt!important;color:#1a1a1a!important;font-family:"Courier New",monospace!important;}
+    .proj-section{border:1.5pt solid #0b1f3a!important;border-radius:4pt!important;}
+    button.pro-btn,button.calc-btn{display:none!important;}
+    @page{margin:15mm 12mm;size:A4;}
+  }
+</style>
+</head>
+<body data-tool="tbm">
+<header>
+  <a href="https://yj-chen0830.github.io/engineering-hub/" style="color:var(--gold2);font-size:12.5px;text-decoration:none;display:inline-block;margin-bottom:8px;">← 返回工程計算中心</a>
+  <h1>⛏️ 頂管/潛盾推進力計算</h1>
+  <span>Auld 公式 · 正面阻力 + 管壁摩擦阻力 · 推進力與中繼站需求初判</span>
+</header>
+<main>
+
+<div class="proj-section no-print" id="projSection">
+  <h3>📁 專案資訊（列印時帶入計算書封面）</h3>
+  <div class="proj-grid">
+    <div><label>工程名稱</label><input id="pj-name" placeholder="○○污水下水道推進工程"></div>
+    <div><label>工程地點</label><input id="pj-loc" placeholder="○○市○○區"></div>
+    <div><label>承造廠商</label><input id="pj-contractor" placeholder="○○營造股份有限公司"></div>
+    <div><label>文件編號</label><input id="pj-docno" placeholder="TBM-CAL-001"></div>
+    <div><label>計算者</label><input id="pj-calc" placeholder="姓名"></div>
+    <div><label>審核者</label><input id="pj-review" placeholder="姓名"></div>
+    <div><label>計算日期</label><input id="pj-date" type="date"></div>
+  </div>
+</div>
+
+<div class="mob-tabs">
+  <button class="mob-tab active" onclick="switchMobTab('tbm-in',this)">📋 輸入參數</button>
+  <button class="mob-tab" id="mobTab-tbm-r" onclick="switchMobTab('tbm-r',this)">📊 計算結果</button>
+</div>
+
+<div class="grid">
+  <div class="card mob-active" data-tab="tbm-in">
+    <h2>推進條件輸入</h2>
+    <div class="row2">
+      <div><label>管外徑 D (m)</label><input id="tbm-D" type="number" value="1.2" step="0.01" min="0.1"></div>
+      <div><label>頂進長度 L (m)</label><input id="tbm-L" type="number" value="180" step="1" min="1"></div>
+    </div>
+    <div class="row2">
+      <div><label>覆土深度 H (m)</label><input id="tbm-H" type="number" value="6" step="0.1" min="0"></div>
+      <div><label>土壤單位重 γ (kN/m³)</label><input id="tbm-gamma" type="number" value="18" step="0.1" min="1"></div>
+    </div>
+    <label>地表超載 q (kPa)</label>
+    <input id="tbm-q" type="number" value="10" step="0.1" min="0">
+
+    <div class="sec">正面阻力</div>
+    <label>正面阻力模式</label>
+    <select id="tbm-face-mode" onchange="toggleFaceMode()">
+      <option value="terzaghi">Terzaghi 均壓估算 P_face</option>
+      <option value="manual">直接輸入 P_face</option>
+    </select>
+    <div id="tbm-face-terzaghi">
+      <label>正面阻力係數 k_face</label>
+      <input id="tbm-kface" type="number" value="1" step="0.05" min="0">
+      <div class="inline-note">採簡化均壓：P_face = k_face × (γH + q)。常用於初估，正式設計應依地盤/掌子面穩定分析修正。</div>
+    </div>
+    <div id="tbm-face-manual" class="hidden">
+      <label>直接輸入正面阻力 P_face (kPa)</label>
+      <input id="tbm-Pface" type="number" value="118" step="0.1" min="0">
+    </div>
+
+    <div class="sec">管壁摩擦與容許推力</div>
+    <div class="row2">
+      <div><label>管壁單位摩擦阻力 f_skin (kPa)</label><input id="tbm-fskin" type="number" value="8" step="0.1" min="0"></div>
+      <div><label>潤滑折減係數 λ</label><input id="tbm-lube" type="number" value="1" step="0.05" min="0"></div>
+    </div>
+    <div class="inline-note">有效摩擦阻力 = f_skin × λ。典型範圍約 3–30 kPa，泥漿潤滑良好時可取較低值。</div>
+    <label>容許總推力 F_allow (kN)</label>
+    <input id="tbm-Fallow" type="number" value="2500" step="10" min="1">
+
+    <button class="calc-btn" onclick="calcTBM()">計算推進力</button>
+    <div class="note">本工具依 Auld 公式計算總推進力：正面阻力 + 管壁摩擦阻力。FS = F_allow / F_total；當 FS &lt; 1.2 時判定為 NG，並提示增設中繼站（interjack）或分段推進。結果供施工規劃與設備初判，正式採用前應由設計/施工團隊依實際地層、管材、觸變泥漿、轉彎及停機重啟條件複核。</div>
+  </div>
+
+  <div class="card" data-tab="tbm-r">
+    <h2>推進力計算結果</h2>
+    <div id="tbm-result"><p style="color:#888">尚未計算</p></div>
+    <details class="proc" id="tbm-proc" style="display:none">
+      <summary>📋 計算過程（供第三方檢核）</summary>
+      <pre id="tbm-proc-text"></pre>
+    </details>
+    <button class="pro-btn no-print" onclick="openPro()">📄 產出計算書 PDF</button>
+  </div>
+</div>
+
+</main>
+<script>
+function switchMobTab(name,btn){
+  btn.parentElement.querySelectorAll('.mob-tab').forEach(function(t){t.classList.remove('active');});
+  btn.classList.add('active');
+  btn.parentElement.nextElementSibling.querySelectorAll('.card').forEach(function(c){
+    c.classList.toggle('mob-active',c.dataset.tab===name);
+  });
+}
+function openPro(){ JRH.checkEmail(function(){ jrhPrint('頂管/潛盾工程推進力計算書'); }); }
+function v(id){return parseFloat(document.getElementById(id).value)||0;}
+function f1(x){return x.toFixed(1);}
+function f2(x){return x.toFixed(2);}
+function f3(x){return x.toFixed(3);}
+function toggleFaceMode(){
+  var mode=document.getElementById('tbm-face-mode').value;
+  document.getElementById('tbm-face-terzaghi').classList.toggle('hidden',mode!=='terzaghi');
+  document.getElementById('tbm-face-manual').classList.toggle('hidden',mode!=='manual');
+}
+function calcTBM(){
+  var D=v('tbm-D');
+  var L=v('tbm-L');
+  var H=v('tbm-H');
+  var gamma=v('tbm-gamma');
+  var q=v('tbm-q');
+  var mode=document.getElementById('tbm-face-mode').value;
+  var kface=v('tbm-kface');
+  var PfaceManual=v('tbm-Pface');
+  var fskin=v('tbm-fskin');
+  var lube=v('tbm-lube');
+  var Fallow=v('tbm-Fallow');
+
+  var overburden=gamma*H+q;
+  var Pface=(mode==='terzaghi') ? kface*overburden : PfaceManual;
+  var area=Math.PI*D*D/4;
+  var perimeter=Math.PI*D;
+  var fskinEff=fskin*lube;
+  var Fface=Pface*area;
+  var Fskin=perimeter*L*fskinEff;
+  var Ftotal=Fface+Fskin;
+  var FS=Ftotal>0 ? Fallow/Ftotal : 0;
+  var ok=FS>=1.2;
+  var requiredInterjack=ok ? 0 : Math.max(1,Math.ceil(Ftotal/Fallow)-1);
+  var margin=Fallow-Ftotal;
+  var statusClass=ok?'ok':'ng';
+  var statusText=ok?'OK':'NG';
+  var advice=ok
+    ? '容許推力足夠，可依本推進長度規劃。'
+    : '現況容許推力不足，建議增設中繼站（interjack）或縮短單段推進長度。';
+
+  document.getElementById('tbm-result').innerHTML =
+    '<table><tr><th>項目</th><th>數值</th></tr>'+
+    '<tr><td>正面阻力 P_face</td><td>'+f2(Pface)+' kPa</td></tr>'+
+    '<tr><td>開挖面積 A = πD²/4</td><td>'+f3(area)+' m²</td></tr>'+
+    '<tr><td>正面阻力 F_face</td><td>'+f2(Fface)+' kN</td></tr>'+
+    '<tr><td>有效摩擦阻力 f_skin,eff</td><td>'+f2(fskinEff)+' kPa</td></tr>'+
+    '<tr><td>管壁摩擦阻力 F_skin</td><td>'+f2(Fskin)+' kN</td></tr>'+
+    '<tr><td>總推進力 F_total</td><td>'+f2(Ftotal)+' kN</td></tr>'+
+    '<tr><td>容許總推力 F_allow</td><td>'+f2(Fallow)+' kN</td></tr>'+
+    '<tr><td>安全係數 FS = F_allow / F_total</td><td>'+f2(FS)+' <span class="'+statusClass+'">'+statusText+'</span></td></tr>'+
+    '<tr><td>推力餘裕 ΔF = F_allow - F_total</td><td>'+f2(margin)+' kN</td></tr>'+
+    '<tr><td>中繼站需求初判</td><td>'+(ok?'<span class="ok">暫不需增設</span>':'<span class="warn">建議至少 '+requiredInterjack+' 座</span>')+'</td></tr>'+
+    '<tr><td>判定說明</td><td>'+advice+'</td></tr>'+
+    '</table>';
+
+  var p='';
+  p+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  p+='  頂管/潛盾工程推進力計算過程（Auld 公式）\n';
+  p+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  p+='【輸入】\n';
+  p+='  D = '+D+' m\n';
+  p+='  L = '+L+' m\n';
+  p+='  H = '+H+' m\n';
+  p+='  γ = '+gamma+' kN/m³\n';
+  p+='  q = '+q+' kPa\n';
+  p+='  f_skin = '+fskin+' kPa\n';
+  p+='  λ = '+lube+'\n';
+  p+='  F_allow = '+Fallow+' kN\n';
+  if(mode==='terzaghi'){
+    p+='  正面阻力模式 = Terzaghi 均壓估算\n';
+    p+='  k_face = '+kface+'\n\n';
+    p+='【一】正面阻力壓力 P_face\n';
+    p+='  覆土壓力 = γH + q = '+gamma+'×'+H+' + '+q+' = '+f2(overburden)+' kPa\n';
+    p+='  P_face = k_face × (γH + q) = '+kface+' × '+f2(overburden)+' = '+f2(Pface)+' kPa\n\n';
+  }else{
+    p+='  正面阻力模式 = 直接輸入\n';
+    p+='  P_face = '+PfaceManual+' kPa\n\n';
+    p+='【一】正面阻力壓力 P_face\n';
+    p+='  依使用者直接輸入：P_face = '+f2(Pface)+' kPa\n\n';
+  }
+  p+='【二】正面阻力 F_face\n';
+  p+='  A = πD²/4 = π×'+D+'²/4 = '+f3(area)+' m²\n';
+  p+='  F_face = P_face × A = '+f2(Pface)+' × '+f3(area)+' = '+f2(Fface)+' kN\n\n';
+  p+='【三】管壁摩擦阻力 F_skin\n';
+  p+='  有效摩擦阻力 f_skin,eff = f_skin × λ = '+f2(fskin)+' × '+f2(lube)+' = '+f2(fskinEff)+' kPa\n';
+  p+='  圓周長 = πD = π×'+D+' = '+f3(perimeter)+' m\n';
+  p+='  F_skin = π × D × L × f_skin,eff\n';
+  p+='         = π × '+D+' × '+L+' × '+f2(fskinEff)+'\n';
+  p+='         = '+f2(Fskin)+' kN\n\n';
+  p+='【四】總推進力 F_total\n';
+  p+='  F_total = F_face + F_skin = '+f2(Fface)+' + '+f2(Fskin)+' = '+f2(Ftotal)+' kN\n\n';
+  p+='【五】安全係數 FS\n';
+  p+='  FS = F_allow / F_total = '+f2(Fallow)+' / '+f2(Ftotal)+' = '+f2(FS)+'\n';
+  p+='  判定基準：FS ≥ 1.2 為 OK\n';
+  p+='  結果：'+(ok ? 'FS = '+f2(FS)+' ≥ 1.2，OK。' : 'FS = '+f2(FS)+' < 1.2，NG。')+'\n\n';
+  p+='【六】中繼站（interjack）初判\n';
+  if(ok){
+    p+='  F_allow - F_total = '+f2(Fallow)+' - '+f2(Ftotal)+' = '+f2(margin)+' kN\n';
+    p+='  容許推力尚有餘裕，暫不需增設中繼站。\n\n';
+  }else{
+    p+='  F_allow - F_total = '+f2(Fallow)+' - '+f2(Ftotal)+' = '+f2(margin)+' kN\n';
+    p+='  因 FS < 1.2，需評估中繼站分段。\n';
+    p+='  以 F_total / F_allow = '+f2(Ftotal)+' / '+f2(Fallow)+' = '+f2(Ftotal/Fallow)+' 初判，建議至少 '+requiredInterjack+' 座中繼站。\n\n';
+  }
+  p+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  p+='  備註：Auld 公式為業界常用初判法；實務上尚應考慮曲線段附加阻力、停機重啟峰值、管線偏擺、地層變異與觸變泥漿效果。\n';
+  p+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
+
+  document.getElementById('tbm-proc-text').textContent=p;
+  document.getElementById('tbm-proc').style.display='';
+  if(window.innerWidth<768){var b=document.getElementById('mobTab-tbm-r');if(b)switchMobTab('tbm-r',b);}
+}
+
+toggleFaceMode();
+calcTBM();
+</script>
+<script>
+window.jrhDocMeta={
+ "doc":"頂管/潛盾工程推進力計算書",
+ "codes":[
+  "Auld 推進力公式（正面阻力 + 管壁摩擦阻力）",
+  "Terzaghi 土壓概念作為掌子面均壓初估",
+  "施工規劃常用 FS 判定：FS = F_allow / F_total，FS ≥ 1.2"
+ ],
+ "notes":[
+  "本工具供頂管/潛盾單段推進力初步評估使用，未取代詳細施工設計與設備選型。",
+  "正面阻力可採 Terzaghi 均壓概念初估，或由設計者依地層條件、地下水及掌子面穩定分析直接輸入。",
+  "管壁摩擦阻力受管材、超挖量、泥漿潤滑、停機時間與路徑曲率影響甚大，應依類似工程經驗值修正。",
+  "當 FS < 1.2 時，通常應檢討中繼站配置、縮短單段長度、改善潤滑或提高主推設備容量。",
+  "正式施工前應另行檢討啟動峰值推力、曲線推進附加阻力、接頭容許壓應力與中繼站布置。"
+ ]
+};
+</script>
+</body>
+</html>
